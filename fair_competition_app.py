@@ -1,0 +1,146 @@
+import os
+import streamlit as st
+from langchain.document_loaders import TextLoader, UnstructuredFileLoader
+from langchain.text_splitter import CharacterTextSplitter
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain.vectorstores import FAISS
+from langchain_community.llms import Tongyi  # 新版接口
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from langchain.schema import Document
+
+# ================== 1. 加载并切分文档 ==================
+def load_and_split_documents(file_path):
+    try:
+        if file_path.endswith('.txt'):
+            loader = TextLoader(file_path, encoding="utf-8")
+        else:
+            loader = UnstructuredFileLoader(file_path)
+        documents = loader.load()
+        text_splitter = CharacterTextSplitter(chunk_size=300, chunk_overlap=50)
+        docs = text_splitter.split_documents(documents)
+        return docs
+    except Exception as e:
+        st.error(f"Error loading {file_path}: {e}")
+        raise
+
+# ================== 2. 初始化 Embedding 模型 ==================
+def get_embeddings():
+    model_name = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    embeddings = HuggingFaceEmbeddings(model_name=model_name)
+    return embeddings
+
+# ================== 3. 构建向量数据库 ==================
+def build_vectorstore(docs, embeddings):
+    vectorstore = FAISS.from_documents(docs, embeddings)
+    return vectorstore
+
+# ================== 4. 初始化 Qwen LLM（Tongyi）==================
+def get_llm(api_key):
+    llm = Tongyi(model_name="qwen-max", dashscope_api_key=api_key)
+    return llm
+
+# ================== 5. 定义 Prompt 模板 ==================
+def get_prompt_template():
+    template = """用户问题：{question}
+
+相关法律条文：{context}
+
+请简要判断该政策是否违反公平竞争原则，并说明依据：
+"""
+    prompt = PromptTemplate(template=template, input_variables=["question", "context"])
+    return prompt
+
+# ================== 6. 构建 QA 链 ==================
+def build_qa_chain(vectorstore, llm, prompt):
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=vectorstore.as_retriever(search_kwargs={"k": 2}),
+        chain_type_kwargs={"prompt": prompt}
+    )
+    return qa_chain
+
+# ================== Streamlit 应用入口 ==================
+def main():
+    st.title("⚖️ 公平竞争审查工具")
+
+    # 输入部分
+    st.header("输入")
+    uploaded_file = st.file_uploader("上传文档 (支持 .txt 和其他格式)", type=["txt", "pdf", "docx"])
+    user_question = st.text_area("或直接输入您的问题：")
+
+    # 提交按钮
+    submit_button = st.button("提交")
+
+    # 设置 DashScope API Key
+    api_key = st.sidebar.text_input("请输入你的DashScope API Key:", type="password")
+    if not api_key:
+        st.warning("请先输入API Key！")
+        return
+
+    os.environ["DASHSCOPE_API_KEY"] = api_key
+
+    if submit_button:
+        if not uploaded_file and not user_question.strip():
+            st.error("请选择上传文档或输入问题！")
+            return
+
+        # 清空之前的处理过程和结果
+        processing_status = st.empty()
+        result_display = st.empty()
+
+        # 处理文档
+        if uploaded_file:
+            file_path = os.path.join(os.getcwd(), uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            processing_status.markdown("**正在加载并切分文档...**")
+            try:
+                docs = load_and_split_documents(file_path)
+            except Exception as e:
+                st.error(f"加载文档失败: {e}")
+                return
+        else:
+            # 将用户输入的问题转换为 Document 对象
+            docs = [Document(page_content=user_question, metadata={})]
+
+        # 步骤 2：初始化 Embedding 模型
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...**")
+        embeddings = get_embeddings()
+
+        # 步骤 3：构建 FAISS 向量数据库
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...\n正在构建向量数据库...**")
+        vectorstore = build_vectorstore(docs, embeddings)
+
+        # 步骤 4：初始化 LLM
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...\n正在构建向量数据库...\n正在加载 Qwen 模型...**")
+        llm = get_llm(api_key)
+
+        # 步骤 5：定义 Prompt 模板
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...\n正在构建向量数据库...\n正在加载 Qwen 模型...\n正在构建 Prompt 模板...**")
+        prompt = get_prompt_template()
+
+        # 步骤 6：构建 QA 链
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...\n正在构建向量数据库...\n正在加载 Qwen 模型...\n正在构建 Prompt 模板...\n正在整合 RetrievalQA 链...**")
+        qa_chain = build_qa_chain(vectorstore, llm, prompt)
+
+        # 用户输入查询
+        query = user_question if user_question.strip() else "默认问题"
+        processing_status.markdown("**正在加载并切分文档...\n正在加载 Embedding 模型...\n正在构建向量数据库...\n正在加载 Qwen 模型...\n正在构建 Prompt 模板...\n正在整合 RetrievalQA 链...\n正在推理...**")
+        try:
+            result = qa_chain.run(query)
+        except Exception as e:
+            st.error(f"推理失败: {e}")
+            return
+
+        # 显示结果
+        processing_status.markdown("**完成！**")
+        result_display.success("回答结果：")
+        result_display.write(result)
+
+if __name__ == "__main__":
+    main()
+
+
+
