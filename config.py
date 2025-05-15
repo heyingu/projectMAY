@@ -15,6 +15,8 @@ class Config:
     # API 密钥（从环境变量获取）
     @property
     def DASHSCOPE_API_KEY(self):
+        #export DASHSCOPE_API_KEY="sk-7fb2aee47f5d4531855a7ac3412249fe"
         return os.getenv("DASHSCOPE_API_KEY", "sk-default-key")
+
 
 config = Config()

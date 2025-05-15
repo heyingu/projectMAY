@@ -26,3 +26,16 @@ def process_single_file(file_path):
     except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return []
+
+def process_queries_concurrently(qa_chain, queries, max_workers=None):
+    from config import config
+    max_workers = max_workers or config.WORKER_NUM
+    
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(
+                lambda q: {"question": q, "result": qa_chain.run(q)},
+                query
+            ) for query in queries
+        ]
+        return [future.result() for future in as_completed(futures)]
