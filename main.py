@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#pip install langchain langchain-community faiss-cpu python-docx pypdf dashscope sentence-transformers
+#pip install langchain langchain-community faiss-cpu python-docx pypdf dashscope sentence-transformers hf_xet
 from core.data_loader import load_special_document, create_documents_from_sections
 from core.text_splitter import split_policy_documents
 from core.embeddings import get_embeddings
@@ -10,7 +10,10 @@ from core.parallel import process_files_concurrently, process_queries_concurrent
 from core.qa_chain import create_qa_chain
 from config import config
 import os
+import dashscope
 
+print("当前环境变量中的API Key:", os.getenv("DASHSCOPE_API_KEY"))
+print("Dashscope SDK 使用的API Key:", dashscope.api_key)
 def main():
     try:
         # ================== 环境变量准备阶段 ==================
