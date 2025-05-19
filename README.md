@@ -1,1 +1,12 @@
 # projectMAY
+#data_loader 包含三个函数，load_special_document用于读取法律条例，后续改为数据库；general_file_loader用于读取TXT、pdf、doc文件；create_documents_from_sections用于将切分好的文件组成字典。\
+#embeddings 定义了关于embedding的模型\
+#llm 定义了调用的llm模型\
+#parrllel 包含三个函数，process_single_file和process_files_concurrently用于处理法律条例；process_queries_concurrently用于处理政策文件\
+#prompts 定义了prompt的模版\
+#qa_chain 创建QAchain\
+#text_splitter  对读取的文件进行预处理，方便切分\
+#vectorstore 创建向量数据库，后续改为外部引用\
+#ocr 包含ocr和scratch两个文件，需要在另一个环境中运行，会与当前环境冲突\
+#.env 保存环境变量\
+#config 包含所有超参数\
