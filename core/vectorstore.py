@@ -21,7 +21,7 @@ def build_vectorstore(docs):
 
     # 连接到 MongoDB
     connection_string_read = "mongodb://readonly_user:wyx123@10.234.176.114:27017/?authSource=公平竞争规则"#只读
-    connection_string_admin = "mongodb://localhost:27017/"#管理
+    connection_string_admin = "mongodb://admin:wyx15757569582@localhost:27017/?authSource=admin"  # 管理
     client = MongoClient(connection_string_read)
     db = client['公平竞争规则']
     collection = db['list1']
