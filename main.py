@@ -68,9 +68,9 @@ def main():
         # ================== 结果输出阶段 ==================
         print("\n" + "="*30 + " 最终推理结果 " + "="*30)
         for idx, item in enumerate(results, 1):
-            print(f"\n🔍 问题 {idx}/{len(results)}")
-            print(f"❓ {item['question']}")
-            print(f"📝 回答：\n{item['result']}")
+            print(f"\n🔍 政策片段 {idx}/{len(results)}")
+            print(f"{item['question']}")
+            print(f"📝 审查报告：\n{item['result']}")
             print("-" * 60)
 
     except Exception as e:
