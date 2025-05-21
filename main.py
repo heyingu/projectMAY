@@ -22,19 +22,20 @@ def main():
             raise ValueError("未找到 DASHSCOPE_API_KEY，请设置环境变量")
 
         # ================== 数据处理阶段 ==================
-        # 加载并处理法律文档
-        print("\n[阶段1] 正在加载核心法律文档...")
-        raw_text = load_special_document("laws.txt")
-        policy_sections = split_policy_documents(raw_text)
-        legal_docs = create_documents_from_sections(policy_sections)
-        print(f"→ 成功加载 {len(legal_docs)} 条法律条款")
-
-        # 初始化 Embedding 模型
-        print("\n[阶段2] 正在初始化语义嵌入模型...")
-        embeddings = get_embeddings()
+        # # 加载并处理法律文档
+        # print("\n[阶段1] 正在加载核心法律文档...")
+        # raw_text = load_special_document("laws.txt")
+        # policy_sections = split_policy_documents(raw_text)
+        # legal_docs = create_documents_from_sections(policy_sections)
+        # print(f"→ 成功加载 {len(legal_docs)} 条法律条款")
+        #
+        # # 初始化 Embedding 模型
+        # print("\n[阶段2] 正在初始化语义嵌入模型...")
+        # embeddings = get_embeddings()
 
         # 构建向量数据库
         print("\n[阶段3] 正在构建法律知识向量库...")
+        legal_docs = []
         vectorstore = build_vectorstore(legal_docs)
         print(f"→ 向量库已包含 {vectorstore.index.ntotal} 个向量")
 
