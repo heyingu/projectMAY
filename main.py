@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #pip install langchain langchain-community faiss-cpu python-docx pypdf dashscope sentence-transformers hf_xet
-from core.data_loader import load_special_document, create_documents_from_sections
+from core.data_loader import load_special_document, create_documents_from_sections, process_directory
 from core.text_splitter import split_policy_documents
 from core.embeddings import get_embeddings
 from core.vectorstore import build_vectorstore
@@ -55,7 +55,11 @@ def main():
             llm=llm_client.get_client(),
             prompt=prompt
         )
+        # 设置你要处理的根目录路径
+        root_directory = r"C:\Users\Windows 10\Desktop\项目\git\projectMAY\政策文件"  # ⬅️ 替换为你的实际路径
 
+        # 开始批量处理
+        process_directory(root_directory)
         # ================== 问答处理阶段 ==================
         # 读取用户问题文件
         print("\n" + "="*30 + " 开始处理用户问题 " + "="*30)

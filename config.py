@@ -8,7 +8,7 @@ load_dotenv(override=True)  # 强制加载 .env 文件
 class Config:
     # 模型配置
     EMBEDDING_MODEL = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
-    LLM_MODEL = "qwen-max"
+    LLM_MODEL = "qwen-turbo"
 
     # ===== 超时控制配置 =====
     TIMEOUT_CONFIG = {
