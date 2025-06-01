@@ -43,7 +43,7 @@ class Config:
     def dynamic_timeout(text_length):
         """根据文本长度自动计算超时时间"""
         base = 30
-        extra = min(text_length // 500 * 5, 300)  # 每500字符增加5秒，上限300秒
+        extra = min(text_length // 500 * 5, 600)  # 每500字符增加5秒，上限300秒
         return base + extra
 
 

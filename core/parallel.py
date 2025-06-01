@@ -4,7 +4,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from config import config
 
-def process_files_concurrently(root_dir="C:\\Users\Windows 10\Desktop\项目\git\projectMAY\政策文件"):
+def process_files_concurrently(root_dir="D:\\ProcessedFiles"):
     # 收集符合条件的文件路径（只处理 _cl.txt 文件，排除 laws.txt）
     file_paths = [
         f for f in glob.glob(os.path.join(root_dir, "*"))

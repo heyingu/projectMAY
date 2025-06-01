@@ -8,6 +8,8 @@ import tempfile
 import dashscope
 from dashscope import Generation
 OLMOCR_API_URL = "http://127.0.0.1:8000/ocr"
+# 设置 DashScope API Key
+dashscope.api_key = "sk-7fb2aee47f5d4531855a7ac3412249fe"  # 替换为你自己的 API Key
 def load_special_document(file_path="laws.txt"):
     loader = TextLoader(file_path, encoding="utf-8")
     documents = loader.load()
@@ -48,8 +50,8 @@ def process_pdf_with_olmocr(file_path):
 def general_file_loader(file_path):
     if file_path.endswith(".txt"):
         loader = TextLoader(file_path, encoding="utf-8")
-    # elif file_path.endswith(".docx"):
-    #     loader = Docx2txtLoader(file_path)
+    elif file_path.endswith(".docx"):
+        loader = Docx2txtLoader(file_path)
     elif file_path.endswith(".pdf"):
         # 使用 olmOCR 解析 PDF
         temp_txt_path = process_pdf_with_olmocr(file_path)
@@ -155,6 +157,7 @@ def process_directory(root_dir):
     遍历根目录中的所有文件，找到其中的txt，docx，pdf文件都进行处理，
     跳过以 _cl.txt 结尾的文件。
     """
+    root_dir="D:/ProcessedFiles"
     print(f"开始遍历目录: {root_dir}")
     supported_extensions = ('.txt', '.docx', '.pdf')
 

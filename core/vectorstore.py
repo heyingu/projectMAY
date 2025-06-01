@@ -12,6 +12,7 @@ import numpy as np
 os.environ["DASHSCOPE_API_KEY"] = 'sk-12cee5f31a6d4c0b9c000019cdeba574'
 def build_vectorstore(docs):
     """构建向量数据库"""
+
     embedding_model = DashScopeEmbeddings(
         model="text-embedding-v2",
     )
